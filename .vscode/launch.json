@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/epinga/app.py",
+            "args": [
+                "run",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "8000"
+            ],
+            "console": "integratedTerminal",
+            "env": {
+                "POETRY_VIRTUALENVS_CREATE": "false"
+            },
+            "justMyCode": true
+        }
+    ]
+}
