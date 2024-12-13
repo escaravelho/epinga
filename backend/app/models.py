@@ -55,6 +55,10 @@ class UsersPublic(SQLModel):
     data: list[UserPublic]
     count: int
 
+# Properties to receive on item creation
+class Recommendation(SQLModel):
+    pass
+
 
 # Shared properties
 class ItemBase(SQLModel):
