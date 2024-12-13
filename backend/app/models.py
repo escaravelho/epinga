@@ -62,6 +62,38 @@ class Recommendation(SQLModel):
     pass
 
 
+# many to many relationship between beverages and tags
+class BeverageTags(SQLModel, table=True):
+    beverage_id: uuid.UUID = Field(foreign_key="beverage.id", primary_key=True)
+    tag_id: int = Field(foreign_key="tags.id", primary_key=True)
+
+
+class TagsBase(SQLModel):
+    name: str = Field(max_length=255)
+
+
+class Tags(TagsBase, table=True):
+    id: int = Field(default=None, primary_key=True)
+    beverages: list["Beverage"] = Relationship(back_populates="tags", link_model=BeverageTags)
+
+
+class TagsPublic(TagsBase):
+    id: int
+
+
+class CategoryBase(SQLModel):
+    name: str = Field(max_length=255)
+
+
+class Category(CategoryBase, table=True):
+    id: int = Field(default=None, primary_key=True)
+    beverages: list["Beverage"] = Relationship(back_populates="category")
+
+
+class CategoryPublic(CategoryBase):
+    id: int
+
+
 # Shared properties
 class BeverageBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
@@ -77,6 +109,7 @@ class BeverageCreate(BeverageBase):
     description: str | None = None
     barcode: str | None = None
     category_id: int | None = None
+    tags: list[int] | None = None
     pass
 
 
@@ -84,6 +117,7 @@ class BeverageCreate(BeverageBase):
 class BeverageUpdate(BeverageBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
     barcode: str | None = Field(default=None, max_length=255)
+    tags: list[int] | None = None
 
 
 # Database model, database table inferred from class name
@@ -94,8 +128,9 @@ class Beverage(BeverageBase, table=True):
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
     owner: User | None = Relationship(back_populates="beverages")
-    category_id: int = Field(foreign_key="category.id", nullable=True)
-    category: Optional["Category"] = Relationship()
+    tags: list["Tags"] = Relationship(back_populates="beverages", link_model=BeverageTags)
+    category_id: int | None = Field(default=None, foreign_key="category.id")
+    category: Optional["Category"] = Relationship(back_populates="beverages")
 
 
 # Properties to return via API, id is always required
@@ -104,22 +139,12 @@ class BeveragePublic(BeverageBase):
     owner_id: uuid.UUID
     category: Optional["Category"] = None
     barcode: str | None = None
+    tags: list[TagsPublic] | None = None
 
 
 class BeveragesPublic(SQLModel):
     data: list[BeveragePublic]
     count: int
-
-class CategoryBase(SQLModel):
-    name: str = Field(max_length=255)
-
-
-class Category(CategoryBase, table=True):
-    id: int = Field(default=None, primary_key=True)
-
-
-class CategoryPublic(CategoryBase):
-    id: int
 
 
 # Generic message
