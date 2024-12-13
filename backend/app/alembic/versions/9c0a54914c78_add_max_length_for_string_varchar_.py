@@ -1,4 +1,4 @@
-"""Add max length for string(varchar) fields in User and Items models
+"""Add max length for string(varchar) fields in User and beverages models
 
 Revision ID: 9c0a54914c78
 Revises: e2412789c190
@@ -30,14 +30,14 @@ def upgrade():
                type_=sa.String(length=255),
                existing_nullable=True)
 
-    # Adjust the length of the title field in the Item table
-    op.alter_column('item', 'title',
+    # Adjust the length of the title field in the beverage table
+    op.alter_column('beverage', 'title',
                existing_type=sa.String(),
                type_=sa.String(length=255),
                existing_nullable=False)
 
-    # Adjust the length of the description field in the Item table
-    op.alter_column('item', 'description',
+    # Adjust the length of the description field in the beverage table
+    op.alter_column('beverage', 'description',
                existing_type=sa.String(),
                type_=sa.String(length=255),
                existing_nullable=True)
@@ -56,14 +56,14 @@ def downgrade():
                type_=sa.String(),
                existing_nullable=True)
 
-    # Revert the length of the title field in the Item table
-    op.alter_column('item', 'title',
+    # Revert the length of the title field in the beverage table
+    op.alter_column('beverage', 'title',
                existing_type=sa.String(length=255),
                type_=sa.String(),
                existing_nullable=False)
 
-    # Revert the length of the description field in the Item table
-    op.alter_column('item', 'description',
+    # Revert the length of the description field in the beverage table
+    op.alter_column('beverage', 'description',
                existing_type=sa.String(length=255),
                type_=sa.String(),
                existing_nullable=True)

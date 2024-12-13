@@ -11,18 +11,18 @@ router = APIRouter(prefix="/beverages", tags=["beverages"])
 
 
 @router.get("/", response_model=BeveragesPublic)
-def read_items(
+def read_beverages(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
-    Retrieve items.
+    Retrieve beverages.
     """
 
     if current_user.is_superuser:
         count_statement = select(func.count()).select_from(Beverage)
         count = session.exec(count_statement).one()
         statement = select(Beverage).offset(skip).limit(limit)
-        items = session.exec(statement).all()
+        beverages = session.exec(statement).all()
     else:
         count_statement = (
             select(func.count())
@@ -36,74 +36,74 @@ def read_items(
             .offset(skip)
             .limit(limit)
         )
-        items = session.exec(statement).all()
+        beverages = session.exec(statement).all()
 
-    return BeveragesPublic(data=items, count=count)
+    return BeveragesPublic(data=beverages, count=count)
 
 
 @router.get("/{id}", response_model=BeveragePublic)
-def read_item(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
+def read_beverage(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
     """
-    Get item by ID.
+    Get beverage by ID.
     """
-    item = session.get(Beverage, id)
-    if not item:
+    beverage = session.get(Beverage, id)
+    if not beverage:
         raise HTTPException(status_code=404, detail="Beverage not found")
-    if not current_user.is_superuser and (item.owner_id != current_user.id):
+    if not current_user.is_superuser and (beverage.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return item
+    return beverage
 
 
 @router.post("/", response_model=BeveragePublic)
-def create_item(
-    *, session: SessionDep, current_user: CurrentUser, item_in: BeverageCreate
+def create_beverage(
+    *, session: SessionDep, current_user: CurrentUser, beverage_in: BeverageCreate
 ) -> Any:
     """
-    Create new item.
+    Create new beverage.
     """
-    item = Beverage.model_validate(item_in, update={"owner_id": current_user.id})
-    session.add(item)
+    beverage = Beverage.model_validate(beverage_in, update={"owner_id": current_user.id})
+    session.add(beverage)
     session.commit()
-    session.refresh(item)
-    return item
+    session.refresh(beverage)
+    return beverage
 
 
 @router.put("/{id}", response_model=BeveragePublic)
-def update_item(
+def update_beverage(
     *,
     session: SessionDep,
     current_user: CurrentUser,
     id: uuid.UUID,
-    item_in: BeverageUpdate,
+    beverage_in: BeverageUpdate,
 ) -> Any:
     """
-    Update an item.
+    Update an beverage.
     """
-    item = session.get(Beverage, id)
-    if not item:
+    beverage = session.get(Beverage, id)
+    if not beverage:
         raise HTTPException(status_code=404, detail="Beverage not found")
-    if not current_user.is_superuser and (item.owner_id != current_user.id):
+    if not current_user.is_superuser and (beverage.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    update_dict = item_in.model_dump(exclude_unset=True)
-    item.sqlmodel_update(update_dict)
-    session.add(item)
+    update_dict = beverage_in.model_dump(exclude_unset=True)
+    beverage.sqlmodel_update(update_dict)
+    session.add(beverage)
     session.commit()
-    session.refresh(item)
-    return item
+    session.refresh(beverage)
+    return beverage
 
 
 @router.delete("/{id}")
-def delete_item(
+def delete_beverage(
     session: SessionDep, current_user: CurrentUser, id: uuid.UUID
 ) -> Message:
     """
-    Delete an item.
+    Delete an beverage.
     """
-    item = session.get(Beverage, id)
-    if not item:
+    beverage = session.get(Beverage, id)
+    if not beverage:
         raise HTTPException(status_code=404, detail="Beverage not found")
-    if not current_user.is_superuser and (item.owner_id != current_user.id):
+    if not current_user.is_superuser and (beverage.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    session.delete(item)
+    session.delete(beverage)
     session.commit()
     return Message(message="Beverage deleted successfully")

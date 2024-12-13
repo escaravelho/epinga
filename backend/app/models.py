@@ -1,5 +1,6 @@
 import uuid
 
+from typing import Optional
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -43,7 +44,7 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    beverages: list["Beverage"] = Relationship(back_populates="owner", cascade_delete=True)
 
 
 # Properties to return via API, id is always required
@@ -55,46 +56,70 @@ class UsersPublic(SQLModel):
     data: list[UserPublic]
     count: int
 
-# Properties to receive on item creation
+
+# Properties to receive on beverage creation
 class Recommendation(SQLModel):
     pass
 
 
 # Shared properties
-class ItemBase(SQLModel):
+class BeverageBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
+    category: str | None = Field(default=None, max_length=255)
     description: str | None = Field(default=None, max_length=255)
+    barcode: str | None = Field(default=None, max_length=255)
 
 
-# Properties to receive on item creation
-class ItemCreate(ItemBase):
+# Properties to receive on beverage creation
+class BeverageCreate(BeverageBase):
+    title: str
+    category: str | None = None
+    description: str | None = None
+    barcode: str | None = None
+    category_id: int | None = None
     pass
 
 
-# Properties to receive on item update
-class ItemUpdate(ItemBase):
+# Properties to receive on beverage update
+class BeverageUpdate(BeverageBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    barcode: str | None = Field(default=None, max_length=255)
 
 
 # Database model, database table inferred from class name
-class Item(ItemBase, table=True):
+class Beverage(BeverageBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     title: str = Field(max_length=255)
     owner_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
-    owner: User | None = Relationship(back_populates="items")
+    owner: User | None = Relationship(back_populates="beverages")
+    category_id: int = Field(foreign_key="category.id", nullable=True)
+    category: Optional["Category"] = Relationship()
 
 
 # Properties to return via API, id is always required
-class ItemPublic(ItemBase):
+class BeveragePublic(BeverageBase):
     id: uuid.UUID
     owner_id: uuid.UUID
+    category: Optional["Category"] = None
+    barcode: str | None = None
 
 
-class ItemsPublic(SQLModel):
-    data: list[ItemPublic]
+class BeveragesPublic(SQLModel):
+    data: list[BeveragePublic]
     count: int
+
+class CategoryBase(SQLModel):
+    name: str = Field(max_length=255)
+
+
+class Category(CategoryBase, table=True):
+    id: int = Field(default=None, primary_key=True)
+
+
+class CategoryPublic(CategoryBase):
+    id: int
 
 
 # Generic message

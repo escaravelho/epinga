@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
-from app.api.routes import items, login, recommendation, private, users, utils
+from app.api.routes import beverages, login, recommendation, private, users, utils
 from app.core.config import settings
 
 api_router = APIRouter()
-api_router.include_router(items.router)
+api_router.include_router(beverages.router)
 api_router.include_router(recommendation.router)
 api_router.include_router(login.router)
 # api_router.include_router(users.router)

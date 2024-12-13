@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
-from app.models import Recommendation, ItemsPublic
+from app.models import Recommendation, BeveragesPublic
 
 router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 
@@ -19,7 +19,7 @@ def recommendation_recipes(
 
     return True
 
-@router.post("/beverages", response_model=ItemsPublic)
+@router.post("/beverages", response_model=BeveragesPublic)
 def recommendation_beverages(
     *, session: SessionDep, current_user: CurrentUser, item_in: Recommendation
 ) -> Any:
