@@ -41,6 +41,8 @@ class Settings(BaseSettings):
         list[AnyUrl] | str, BeforeValidator(parse_cors)
     ] = []
 
+    OPENAI_API_KEY: str 
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def all_cors_origins(self) -> list[str]:
@@ -49,6 +51,7 @@ class Settings(BaseSettings):
         ]
 
     PROJECT_NAME: str
+    PROJECT_DESCRIPTION: str
     SENTRY_DSN: HttpUrl | None = None
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
