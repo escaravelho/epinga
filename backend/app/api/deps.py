@@ -8,6 +8,7 @@ from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 from sqlmodel import Session
 
+from openai import OpenAI
 from app.core import security
 from app.core.config import settings
 from app.core.db import engine
@@ -23,6 +24,12 @@ def get_db() -> Generator[Session, None, None]:
         yield session
 
 
+def get_ai_client() -> Generator[OpenAI, None, None]:
+    with OpenAI() as client:
+        yield client
+
+
+AIDep = Annotated[OpenAI, Depends(get_ai_client)]
 SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 

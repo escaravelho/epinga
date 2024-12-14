@@ -139,7 +139,7 @@ class BeveragePublic(BeverageBase):
     owner_id: uuid.UUID
     category: Optional["Category"] = None
     barcode: str | None = None
-    tags: list[TagsPublic] | None = None
+    tags: list[Tags] | None = None
 
 
 class BeveragesPublic(SQLModel):
@@ -166,3 +166,17 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+
+
+class Barcode(SQLModel):
+    barcode: str
+
+class Recipe(SQLModel):
+    title: str
+    ingredients: list[str]
+    steps: list[str]
+
+class RecommendationResponse(SQLModel):
+    debugInfo: dict[str, str]
+    cocktails: list[Recipe]
+    sideDishes: list[Recipe]
